@@ -1,0 +1,22 @@
+services:
+  mongo:
+    image: mongo:7
+    volumes: ["mongo_data:/data/db"]
+  redis:
+    image: redis:7-alpine
+  server:
+    build: ./server
+    ports: ["3000:3000"]
+    environment:
+      PORT: 3000
+      MONGODB_URI: mongodb://mongo:27017/weather
+      REDIS_URL: redis://redis:6379
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      CLIENT_ORIGIN: http://localhost:5173
+    depends_on: [mongo, redis]
+  client:
+    build: ./client
+    ports: ["5173:80"]
+    depends_on: [server]
+volumes:
+  mongo_data:
